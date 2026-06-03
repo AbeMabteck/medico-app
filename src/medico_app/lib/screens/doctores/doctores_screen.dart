@@ -3,6 +3,7 @@ import '../../constants/app_theme.dart';
 import '../../models/consulta_model.dart';
 import '../../services/doctor_service.dart';
 import 'nuevo_doctor_screen.dart';
+import 'editar_doctor_screen.dart';
 
 class DoctoresScreen extends StatefulWidget {
   const DoctoresScreen({super.key});
@@ -192,6 +193,24 @@ class _DoctoresScreenState extends State<DoctoresScreen> {
                 ],
               ),
             ),
+            // Botón editar
+            IconButton(
+              icon: const Icon(
+                Icons.edit_outlined,
+                color: AppTheme.primaryColor,
+              ),
+              onPressed: () async {
+                final result = await Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => EditarDoctorScreen(doctor: doctor),
+                  ),
+                );
+                if (result == true) _loadDoctores();
+              },
+              tooltip: 'Editar',
+            ),
+            // Botón eliminar
             IconButton(
               icon: const Icon(
                 Icons.delete_outline,

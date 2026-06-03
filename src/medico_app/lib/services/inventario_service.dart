@@ -91,6 +91,35 @@ class InventarioService {
     }
   }
 
+  // Actualizar inventario completo
+  Future<void> actualizarInventario({
+    required int id,
+    required int cantidadActual,
+    required int cantidadMinima,
+    required String unidad,
+    DateTime? fechaCaducidad,
+    String? lugarCompra,
+    double? precio,
+  }) async {
+    final headers = await _getHeaders();
+    final response = await http.put(
+      Uri.parse('${ApiConstants.inventario}/$id'),
+      headers: headers,
+      body: jsonEncode({
+        'cantidadActual': cantidadActual,
+        'cantidadMinima': cantidadMinima,
+        'unidad': unidad,
+        'fechaCaducidad': fechaCaducidad?.toIso8601String(),
+        'lugarCompra': lugarCompra,
+        'precio': precio,
+      }),
+    );
+
+    if (response.statusCode != 204) {
+      throw Exception('Error al actualizar inventario');
+    }
+  }
+
   // Actualizar cantidad
   Future<void> actualizarCantidad(int id, int nuevaCantidad) async {
     final headers = await _getHeaders();

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import '../../constants/app_theme.dart';
-import '../../services/auth_service.dart';
+import '../services/auth_service.dart';
 import 'auth/login_screen.dart';
 import 'consultas/consultas_screen.dart';
+import 'doctores/doctores_screen.dart';
 import 'inventario/inventario_screen.dart';
 import 'tratamientos/tratamientos_screen.dart';
 
@@ -19,6 +19,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   final List<Widget> _screens = [
     const ConsultasScreen(),
+    const DoctoresScreen(),
     const InventarioScreen(),
     const TratamientosScreen(),
   ];
@@ -51,6 +52,11 @@ class _HomeScreenState extends State<HomeScreen> {
             icon: Icon(Icons.medical_information_outlined),
             activeIcon: Icon(Icons.medical_information),
             label: 'Historial',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person_outlined),
+            activeIcon: Icon(Icons.person),
+            label: 'Doctores',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.inventory_2_outlined),

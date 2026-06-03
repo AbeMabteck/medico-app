@@ -36,13 +36,13 @@ dependencies:
   cupertino_icons: ^1.0.8
   http: ^1.6.0
   shared_preferences: ^2.5.5
-  flutter_local_notifications: ^21.0.0
   image_picker: ^1.2.2
   intl: ^0.20.2
   provider: ^6.1.5+1
   flutter_localizations:
     sdk: flutter
-
+  flutter_local_notifications: 17.2.4
+  timezone: 0.9.4
 dev_dependencies:
   flutter_test:
     sdk: flutter

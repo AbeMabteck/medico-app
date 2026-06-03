@@ -3,6 +3,7 @@ import '../../constants/app_theme.dart';
 import '../../models/inventario_model.dart';
 import '../../services/inventario_service.dart';
 import '../../services/tratamiento_service.dart';
+import '../../services/notification_service.dart';
 
 class NuevoTratamientoScreen extends StatefulWidget {
   const NuevoTratamientoScreen({super.key});
@@ -83,11 +84,20 @@ class _NuevoTratamientoScreenState extends State<NuevoTratamientoScreen> {
       );
 
       if (mounted) {
+        // Obtener tomas y programar notificaciones
+        final tomas = await _tratamientoService.getTomas(result['id']);
+        await NotificationService().programarTodasLasTomas(
+          tratamientoId: result['id'],
+          medicamento: _medicamentoSeleccionado!.nombre,
+          dosis: _dosisCtrl.text.trim(),
+          horasProgramadas: tomas.map((t) => t.horaProgramada).toList(),
+        );
+
         Navigator.pop(context, true);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              '✅ Tratamiento creado con ${result['tomasGeneradas']} tomas programadas',
+              '✅ Tratamiento creado con ${result['tomasGeneradas']} tomas y notificaciones programadas',
             ),
             backgroundColor: AppTheme.successColor,
           ),

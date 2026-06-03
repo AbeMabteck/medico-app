@@ -1,0 +1,6 @@
+@MedicoApp.API_HostAddress = http://localhost:5224
+
+GET {{MedicoApp.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

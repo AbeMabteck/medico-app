@@ -17,6 +17,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   int _currentIndex = 0;
   final _authService = AuthService();
+  String _nombreUsuario = '';
 
   final List<Widget> _screens = [
     const ConsultasScreen(),
@@ -24,6 +25,24 @@ class _HomeScreenState extends State<HomeScreen> {
     const InventarioScreen(),
     const TratamientosScreen(),
   ];
+
+  final List<String> _titles = [
+    'Historial Clínico',
+    'Mis Doctores',
+    'Inventario',
+    'Tratamientos',
+  ];
+
+  @override
+  void initState() {
+    super.initState();
+    _loadNombre();
+  }
+
+  Future<void> _loadNombre() async {
+    final nombre = await _authService.getNombre();
+    setState(() => _nombreUsuario = nombre ?? '');
+  }
 
   Future<void> _logout() async {
     await _authService.logout();
@@ -39,14 +58,34 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('MedicoApp'),
+        title: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              _titles[_currentIndex],
+              style: const TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+            ),
+            if (_nombreUsuario.isNotEmpty)
+              Text(
+                'Hola, $_nombreUsuario',
+                style: const TextStyle(fontSize: 12, color: Colors.white70),
+              ),
+          ],
+        ),
         actions: [
           IconButton(
             icon: const Icon(Icons.account_circle_outlined),
-            onPressed: () => Navigator.push(
-              context,
-              MaterialPageRoute(builder: (_) => const PerfilScreen()),
-            ),
+            onPressed: () async {
+              await Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const PerfilScreen()),
+              );
+              _loadNombre();
+            },
             tooltip: 'Mi perfil',
           ),
           IconButton(

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../services/auth_service.dart';
 import 'auth/login_screen.dart';
+import 'dashboard_screen.dart';
 import 'consultas/consultas_screen.dart';
 import 'doctores/doctores_screen.dart';
 import 'inventario/inventario_screen.dart';
@@ -20,6 +21,7 @@ class _HomeScreenState extends State<HomeScreen> {
   String _nombreUsuario = '';
 
   final List<Widget> _screens = [
+    const DashboardScreen(),
     const ConsultasScreen(),
     const DoctoresScreen(),
     const InventarioScreen(),
@@ -27,6 +29,7 @@ class _HomeScreenState extends State<HomeScreen> {
   ];
 
   final List<String> _titles = [
+    'Inicio',
     'Historial Clínico',
     'Mis Doctores',
     'Inventario',
@@ -100,6 +103,11 @@ class _HomeScreenState extends State<HomeScreen> {
         currentIndex: _currentIndex,
         onTap: (index) => setState(() => _currentIndex = index),
         items: const [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home_outlined),
+            activeIcon: Icon(Icons.home),
+            label: 'Inicio',
+          ),
           BottomNavigationBarItem(
             icon: Icon(Icons.medical_information_outlined),
             activeIcon: Icon(Icons.medical_information),

@@ -30,6 +30,21 @@ class InventarioService {
     throw Exception('Error al obtener inventario');
   }
 
+  // Obtener stock bajo
+  Future<List<InventarioModel>> getStockBajo() async {
+    final headers = await _getHeaders();
+    final response = await http.get(
+      Uri.parse(ApiConstants.inventarioStockBajo),
+      headers: headers,
+    );
+
+    if (response.statusCode == 200) {
+      final List data = jsonDecode(response.body);
+      return data.map((i) => InventarioModel.fromJson(i)).toList();
+    }
+    throw Exception('Error al obtener stock bajo');
+  }
+
   // Obtener catálogo
   Future<List<MedicamentoCatalogoModel>> getCatalogo() async {
     final headers = await _getHeaders();

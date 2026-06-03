@@ -1,7 +1,5 @@
 class ApiConstants {
-  static const String baseUrl =
-      'http://10.0.2.2:5224/api'; //10.0.2.2 es la IP especial que usa el emulador de Android para referirse a localhost de tu PC. Cuando pruebas en un celular físico se cambia por la IP local de tu PC.
-
+  static const String baseUrl = 'http://192.168.1.109:5224/api';
   // Auth
   static const String login = '$baseUrl/Auth/login';
   static const String register = '$baseUrl/Auth/register';

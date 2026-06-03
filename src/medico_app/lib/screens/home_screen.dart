@@ -5,6 +5,7 @@ import 'consultas/consultas_screen.dart';
 import 'doctores/doctores_screen.dart';
 import 'inventario/inventario_screen.dart';
 import 'tratamientos/tratamientos_screen.dart';
+import 'perfil_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -40,7 +41,19 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: AppBar(
         title: const Text('MedicoApp'),
         actions: [
-          IconButton(icon: const Icon(Icons.logout), onPressed: _logout),
+          IconButton(
+            icon: const Icon(Icons.account_circle_outlined),
+            onPressed: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const PerfilScreen()),
+            ),
+            tooltip: 'Mi perfil',
+          ),
+          IconButton(
+            icon: const Icon(Icons.logout),
+            onPressed: _logout,
+            tooltip: 'Cerrar sesión',
+          ),
         ],
       ),
       body: _screens[_currentIndex],

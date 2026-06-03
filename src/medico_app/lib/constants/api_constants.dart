@@ -1,8 +1,12 @@
 class ApiConstants {
   static const String baseUrl = 'http://192.168.1.109:5224/api';
+
   // Auth
   static const String login = '$baseUrl/Auth/login';
   static const String register = '$baseUrl/Auth/register';
+
+  // Perfil
+  static const String perfil = '$baseUrl/Perfil';
 
   // Doctores
   static const String doctores = '$baseUrl/Doctores';

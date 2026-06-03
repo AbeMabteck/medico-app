@@ -1,17 +1,112 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:image_picker/image_picker.dart';
 import '../../constants/app_theme.dart';
 import '../../models/consulta_model.dart';
+import '../../services/receta_service.dart';
 
-class DetalleConsultaScreen extends StatelessWidget {
+class DetalleConsultaScreen extends StatefulWidget {
   final ConsultaModel consulta;
 
   const DetalleConsultaScreen({super.key, required this.consulta});
 
   @override
+  State<DetalleConsultaScreen> createState() => _DetalleConsultaScreenState();
+}
+
+class _DetalleConsultaScreenState extends State<DetalleConsultaScreen> {
+  final _recetaService = RecetaService();
+  final _picker = ImagePicker();
+  bool _isUploading = false;
+
+  Future<void> _subirFoto() async {
+    final opcion = await showModalBottomSheet<ImageSource>(
+      context: context,
+      builder: (_) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: const Icon(
+                Icons.camera_alt_outlined,
+                color: AppTheme.primaryColor,
+              ),
+              title: const Text('Tomar foto'),
+              onTap: () => Navigator.pop(context, ImageSource.camera),
+            ),
+            ListTile(
+              leading: const Icon(
+                Icons.photo_library_outlined,
+                color: AppTheme.primaryColor,
+              ),
+              title: const Text('Elegir de galería'),
+              onTap: () => Navigator.pop(context, ImageSource.gallery),
+            ),
+          ],
+        ),
+      ),
+    );
+
+    if (opcion == null) return;
+
+    final picked = await _picker.pickImage(source: opcion, imageQuality: 80);
+
+    if (picked == null) return;
+
+    setState(() => _isUploading = true);
+
+    try {
+      await _recetaService.subirReceta(
+        consultaId: widget.consulta.id,
+        foto: File(picked.path),
+      );
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('✅ Receta subida correctamente'),
+            backgroundColor: AppTheme.successColor,
+          ),
+        );
+        Navigator.pop(context, true);
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error: ${e.toString()}'),
+            backgroundColor: AppTheme.errorColor,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _isUploading = false);
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Detalle de consulta')),
+      appBar: AppBar(
+        title: const Text('Detalle de consulta'),
+        actions: [
+          IconButton(
+            icon: _isUploading
+                ? const SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(
+                      color: Colors.white,
+                      strokeWidth: 2,
+                    ),
+                  )
+                : const Icon(Icons.add_a_photo_outlined),
+            onPressed: _isUploading ? null : _subirFoto,
+            tooltip: 'Agregar receta',
+          ),
+        ],
+      ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -23,73 +118,99 @@ class DetalleConsultaScreen extends StatelessWidget {
                 _buildRow(
                   icon: Icons.calendar_today_outlined,
                   label: 'Fecha',
-                  value: DateFormat('dd/MM/yyyy').format(consulta.fecha),
+                  value: DateFormat('dd/MM/yyyy').format(widget.consulta.fecha),
                 ),
-                if (consulta.doctorNombre != null) ...[
+                if (widget.consulta.doctorNombre != null) ...[
                   const Divider(),
                   _buildRow(
                     icon: Icons.person_outlined,
                     label: 'Doctor',
-                    value: consulta.doctorNombre!,
+                    value: widget.consulta.doctorNombre!,
                   ),
                 ],
-                if (consulta.doctorEspecialidad != null) ...[
+                if (widget.consulta.doctorEspecialidad != null) ...[
                   const Divider(),
                   _buildRow(
                     icon: Icons.medical_services_outlined,
                     label: 'Especialidad',
-                    value: consulta.doctorEspecialidad!,
+                    value: widget.consulta.doctorEspecialidad!,
                   ),
                 ],
               ],
             ),
             const SizedBox(height: 16),
 
-            // Motivo
-            if (consulta.motivo != null)
+            if (widget.consulta.motivo != null)
               _buildSection(
                 title: 'Motivo de consulta',
                 icon: Icons.info_outlined,
-                content: consulta.motivo!,
+                content: widget.consulta.motivo!,
               ),
 
-            // Síntomas
-            if (consulta.sintomas != null)
+            if (widget.consulta.sintomas != null)
               _buildSection(
                 title: 'Síntomas',
                 icon: Icons.sick_outlined,
-                content: consulta.sintomas!,
+                content: widget.consulta.sintomas!,
               ),
 
-            // Diagnóstico
-            if (consulta.diagnostico != null)
+            if (widget.consulta.diagnostico != null)
               _buildSection(
                 title: 'Diagnóstico',
                 icon: Icons.assignment_outlined,
-                content: consulta.diagnostico!,
+                content: widget.consulta.diagnostico!,
               ),
 
-            // Notas
-            if (consulta.notas != null)
+            if (widget.consulta.notas != null)
               _buildSection(
                 title: 'Notas',
                 icon: Icons.notes_outlined,
-                content: consulta.notas!,
+                content: widget.consulta.notas!,
               ),
 
             // Recetas
-            if (consulta.recetas.isNotEmpty) ...[
-              const SizedBox(height: 8),
-              const Text(
-                'Recetas',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: AppTheme.textPrimary,
+            const SizedBox(height: 8),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text(
+                  'Recetas',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: AppTheme.textPrimary,
+                  ),
                 ),
-              ),
-              const SizedBox(height: 8),
-              ...consulta.recetas.map(
+                TextButton.icon(
+                  onPressed: _isUploading ? null : _subirFoto,
+                  icon: const Icon(Icons.add_a_photo_outlined, size: 18),
+                  label: const Text('Agregar'),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+
+            if (widget.consulta.recetas.isEmpty)
+              Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.receipt_outlined,
+                        color: AppTheme.textSecondary.withValues(alpha: 0.5),
+                      ),
+                      const SizedBox(width: 12),
+                      const Text(
+                        'No hay recetas adjuntas',
+                        style: TextStyle(color: AppTheme.textSecondary),
+                      ),
+                    ],
+                  ),
+                ),
+              )
+            else
+              ...widget.consulta.recetas.map(
                 (r) => Card(
                   margin: const EdgeInsets.only(bottom: 8),
                   child: ListTile(
@@ -108,7 +229,6 @@ class DetalleConsultaScreen extends StatelessWidget {
                   ),
                 ),
               ),
-            ],
           ],
         ),
       ),

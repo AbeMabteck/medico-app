@@ -1,7 +1,7 @@
 # MedicoApp — Documentación Técnica
 
-**Versión:** 1.0.0  
-**Fecha:** 2026-06-03  
+**Versión:** 1.1.0  
+**Fecha:** 2026-06-04  
 **Autor:** Abraham Rios  
 
 ---
@@ -15,23 +15,28 @@
 5. [API .NET](#5-api-net)
 6. [Autenticación](#6-autenticación)
 7. [Endpoints](#7-endpoints)
-8. [Estructura del proyecto](#8-estructura-del-proyecto)
-9. [Configuración del entorno](#9-configuración-del-entorno)
-10. [Control de versiones](#10-control-de-versiones)
+8. [Flutter — Estructura](#8-flutter--estructura)
+9. [Flutter — Módulos](#9-flutter--módulos)
+10. [Configuración del entorno](#10-configuración-del-entorno)
+11. [Control de versiones](#11-control-de-versiones)
+12. [Pendientes v2.0](#12-pendientes-v20)
 
 ---
 
 ## 1. Descripción general
 
-MedicoApp es una aplicación móvil multiplataforma (iOS y Android) para la gestión médica personal. Permite al usuario llevar un control de sus consultas médicas, medicamentos en inventario y tratamientos activos con recordatorios automáticos.
+MedicoApp es una aplicación móvil multiplataforma (iOS y Android) para la gestión médica personal. Permite al usuario llevar un control de sus consultas médicas, doctores, medicamentos en inventario y tratamientos activos con recordatorios automáticos.
 
-### Módulos principales
+### Módulos implementados
 
-| Módulo | Descripción |
-|---|---|
-| Historial clínico | Registro de consultas médicas, doctores, síntomas, diagnósticos y recetas |
-| Inventario | Control de medicamentos disponibles con alertas de stock bajo |
-| Tratamientos | Control de tomas programadas con descuento automático del inventario |
+| Módulo | Descripción | Estado |
+|---|---|---|
+| Autenticación | Registro e inicio de sesión con JWT | ✅ Completo |
+| Perfil | Ver y editar datos personales | ✅ Completo |
+| Historial Clínico | Consultas médicas con fotos de recetas | ✅ Completo |
+| Doctores | Registro de médicos | ✅ Completo |
+| Inventario | Control de medicamentos disponibles | ✅ Completo |
+| Tratamientos | Tomas programadas con notificaciones | ✅ Completo |
 
 ---
 
@@ -48,6 +53,8 @@ MedicoApp es una aplicación móvil multiplataforma (iOS y Android) para la gest
 | Autenticación | JWT Bearer | — |
 | Encriptación | BCrypt.Net-Next | — |
 | Documentación API | Swagger / Swashbuckle | 6.9.0 |
+| Notificaciones | flutter_local_notifications | 17.2.4 |
+| Timezone | timezone | 0.9.4 |
 | Control de versiones | Git + GitHub | — |
 
 ---
@@ -59,15 +66,17 @@ MedicoApp es una aplicación móvil multiplataforma (iOS y Android) para la gest
 │         Flutter App             │
 │  • UI/UX multiplataforma        │
 │  • Notificaciones locales       │
-│  • Caché local                  │
+│  • Zona horaria: Mexico_City    │
 └────────────┬────────────────────┘
              │ HTTP / REST / JSON
+             │ IP: 192.168.1.109:5224
 ┌────────────▼────────────────────┐
 │        .NET Web API             │
 │  • Controllers                  │
 │  • JWT Authentication           │
 │  • Entity Framework Core        │
 │  • Manejo de archivos (fotos)   │
+│  • Escucha en 0.0.0.0:5224      │
 └────────────┬────────────────────┘
              │
 ┌────────────▼────────────────────┐
@@ -82,10 +91,23 @@ MedicoApp es una aplicación móvil multiplataforma (iOS y Android) para la gest
 ## 4. Base de datos
 
 **Nombre:** MedicoAppDB  
-**Servidor local:** localhost  
+**Servidor:** localhost  
 **Motor:** SQL Server 2025 Developer Edition  
 
-### Diagrama de tablas
+### Tablas
+
+| Tabla | Descripción |
+|---|---|
+| Users | Usuarios de la app |
+| Doctors | Médicos registrados por usuario |
+| Consultas | Historial de visitas médicas |
+| Recetas | Fotos de recetas por consulta |
+| MedicamentosCatalogo | Catálogo global de medicamentos |
+| Inventario | Stock de medicamentos por usuario |
+| Tratamientos | Tratamientos médicos activos e históricos |
+| Tomas | Registro individual de cada toma programada |
+
+### Relaciones principales
 
 ```
 Users
@@ -101,116 +123,6 @@ MedicamentosCatalogo
   └── Tratamientos (MedicamentoId → FK)
 ```
 
-### Descripción de tablas
-
-#### Users
-Tabla principal de usuarios. Soporta multiusuario desde el diseño inicial.
-
-| Campo | Tipo | Descripción |
-|---|---|---|
-| Id | INT PK | Identificador único |
-| Nombre | NVARCHAR(100) | Nombre completo |
-| Email | NVARCHAR(150) UNIQUE | Correo electrónico |
-| PasswordHash | NVARCHAR(255) | Contraseña encriptada con BCrypt |
-| Telefono | NVARCHAR(20) | Teléfono opcional |
-| FechaNacimiento | DATE | Fecha de nacimiento |
-| TipoSangre | NVARCHAR(5) | Tipo de sangre (ej. O+) |
-| Activo | BIT | Estado del usuario |
-| CreatedAt | DATETIME2 | Fecha de creación |
-| UpdatedAt | DATETIME2 | Fecha de última actualización |
-
-#### Doctors
-Registro de médicos asociados a un usuario.
-
-| Campo | Tipo | Descripción |
-|---|---|---|
-| Id | INT PK | Identificador único |
-| UserId | INT FK | Referencia al usuario |
-| Nombre | NVARCHAR(100) | Nombre del doctor |
-| Especialidad | NVARCHAR(100) | Especialidad médica |
-| Consultorio | NVARCHAR(200) | Dirección o nombre del consultorio |
-| Telefono | NVARCHAR(20) | Teléfono de contacto |
-| Activo | BIT | Soft delete |
-
-#### Consultas
-Historial de visitas médicas.
-
-| Campo | Tipo | Descripción |
-|---|---|---|
-| Id | INT PK | Identificador único |
-| UserId | INT FK | Referencia al usuario |
-| DoctorId | INT FK NULL | Doctor que atendió (opcional) |
-| Fecha | DATE | Fecha de la consulta |
-| Motivo | NVARCHAR(300) | Motivo de la visita |
-| Sintomas | NVARCHAR(1000) | Síntomas presentados |
-| Diagnostico | NVARCHAR(1000) | Diagnóstico del médico |
-| Notas | NVARCHAR(1000) | Notas adicionales |
-
-#### Recetas
-Fotos de recetas médicas asociadas a una consulta.
-
-| Campo | Tipo | Descripción |
-|---|---|---|
-| Id | INT PK | Identificador único |
-| ConsultaId | INT FK | Consulta a la que pertenece |
-| FotoPath | NVARCHAR(500) | Ruta del archivo en el servidor |
-| Notas | NVARCHAR(500) | Notas sobre la receta |
-
-#### MedicamentosCatalogo
-Catálogo global de medicamentos. No está ligado a un usuario específico.
-
-| Campo | Tipo | Descripción |
-|---|---|---|
-| Id | INT PK | Identificador único |
-| Nombre | NVARCHAR(150) | Nombre comercial |
-| NombreGenerico | NVARCHAR(150) | Nombre genérico |
-| Presentacion | NVARCHAR(100) | Forma farmacéutica (tabletas, cápsulas, etc.) |
-| Concentracion | NVARCHAR(100) | Concentración (ej. 500mg) |
-
-#### Inventario
-Stock de medicamentos por usuario.
-
-| Campo | Tipo | Descripción |
-|---|---|---|
-| Id | INT PK | Identificador único |
-| UserId | INT FK | Referencia al usuario |
-| MedicamentoId | INT FK | Referencia al catálogo |
-| CantidadActual | INT | Unidades disponibles |
-| CantidadMinima | INT | Umbral de alerta de stock bajo |
-| Unidad | NVARCHAR(50) | Unidad de medida (tabletas, ml, etc.) |
-| FechaCaducidad | DATE | Fecha de caducidad |
-| LugarCompra | NVARCHAR(200) | Farmacia o lugar de compra |
-| Precio | DECIMAL(10,2) | Precio pagado |
-| Status | NVARCHAR(20) | disponible / agotado / por_vencer / vencido |
-
-#### Tratamientos
-Tratamientos médicos activos e históricos.
-
-| Campo | Tipo | Descripción |
-|---|---|---|
-| Id | INT PK | Identificador único |
-| UserId | INT FK | Referencia al usuario |
-| RecetaId | INT FK NULL | Receta que originó el tratamiento |
-| MedicamentoId | INT FK | Medicamento del tratamiento |
-| Dosis | NVARCHAR(100) | Descripción de la dosis |
-| FrecuenciaHoras | INT | Intervalo entre tomas en horas |
-| DuracionDias | INT | Duración total del tratamiento |
-| FechaInicio | DATE | Fecha de inicio |
-| FechaFin | DATE | Fecha de fin calculada |
-| Status | NVARCHAR(20) | activo / completado / cancelado |
-
-#### Tomas
-Registro individual de cada toma programada.
-
-| Campo | Tipo | Descripción |
-|---|---|---|
-| Id | INT PK | Identificador único |
-| TratamientoId | INT FK | Tratamiento al que pertenece |
-| HoraProgramada | DATETIME2 | Hora en que debe tomarse |
-| HoraTomada | DATETIME2 NULL | Hora real en que se tomó |
-| Status | NVARCHAR(20) | pendiente / tomada / omitida / retrasada |
-| DescontadoInventario | BIT | Indica si ya se descontó del inventario |
-
 ---
 
 ## 5. API .NET
@@ -219,6 +131,7 @@ Registro individual de cada toma programada.
 
 - **Puerto local:** 5224
 - **URL base:** `http://localhost:5224`
+- **URL red local:** `http://192.168.1.109:5224`
 - **Swagger UI:** `http://localhost:5224/swagger`
 - **Formato:** JSON
 - **Autenticación:** JWT Bearer Token
@@ -256,132 +169,175 @@ La API utiliza **JWT (JSON Web Tokens)** con una expiración de 24 horas.
 1. Cliente envía POST /api/Auth/register o /api/Auth/login
 2. API valida credenciales
 3. API genera token JWT firmado con HMACSHA256
-4. Cliente almacena el token
+4. Cliente almacena el token en SharedPreferences
 5. Cliente incluye el token en cada request:
    Authorization: Bearer {token}
 6. API valida el token en cada endpoint protegido
 ```
 
-### Encriptación de contraseñas
-
-Las contraseñas se encriptan con **BCrypt** (salt automático) antes de guardarse en la base de datos. Nunca se almacena la contraseña en texto plano.
-
 ---
 
 ## 7. Endpoints
 
-### Auth
+### Auth (sin JWT)
 
-| Método | Endpoint | Auth | Descripción |
-|---|---|---|---|
-| POST | /api/Auth/register | ❌ | Registro de nuevo usuario |
-| POST | /api/Auth/login | ❌ | Inicio de sesión |
+| Método | Endpoint | Descripción |
+|---|---|---|
+| POST | /api/Auth/register | Registro de nuevo usuario |
+| POST | /api/Auth/login | Inicio de sesión |
+
+### Perfil (JWT requerido)
+
+| Método | Endpoint | Descripción |
+|---|---|---|
+| GET | /api/Perfil | Obtiene datos del usuario |
+| PUT | /api/Perfil | Actualiza datos del usuario |
+
+### Doctores (JWT requerido)
+
+| Método | Endpoint | Descripción |
+|---|---|---|
+| GET | /api/Doctores | Lista todos los doctores |
+| GET | /api/Doctores/{id} | Obtiene un doctor |
+| POST | /api/Doctores | Crea un nuevo doctor |
+| PUT | /api/Doctores/{id} | Actualiza un doctor |
+| DELETE | /api/Doctores/{id} | Desactiva un doctor |
+
+### Consultas (JWT requerido)
+
+| Método | Endpoint | Descripción |
+|---|---|---|
+| GET | /api/Consultas | Lista todas las consultas |
+| GET | /api/Consultas/{id} | Obtiene una consulta con recetas |
+| POST | /api/Consultas | Registra una nueva consulta |
+| PUT | /api/Consultas/{id} | Actualiza una consulta |
+| DELETE | /api/Consultas/{id} | Elimina una consulta |
+
+### Recetas (JWT requerido)
+
+| Método | Endpoint | Descripción |
+|---|---|---|
+| POST | /api/Recetas | Crea receta con foto (multipart/form-data) |
+| GET | /api/Recetas/{id} | Obtiene una receta |
+| DELETE | /api/Recetas/{id} | Elimina receta y archivo físico |
+
+### Inventario (JWT requerido)
+
+| Método | Endpoint | Descripción |
+|---|---|---|
+| GET | /api/Inventario | Lista todo el inventario |
+| GET | /api/Inventario/{id} | Obtiene un item |
+| GET | /api/Inventario/stock-bajo | Items con stock bajo |
+| GET | /api/Inventario/catalogo | Catálogo de medicamentos |
+| POST | /api/Inventario/catalogo | Agrega al catálogo |
+| POST | /api/Inventario | Agrega al inventario |
+| PUT | /api/Inventario/{id} | Actualiza item |
+| DELETE | /api/Inventario/{id} | Elimina item |
+
+### Tratamientos (JWT requerido)
+
+| Método | Endpoint | Descripción |
+|---|---|---|
+| GET | /api/Tratamientos | Lista todos los tratamientos |
+| GET | /api/Tratamientos/activos | Lista tratamientos activos |
+| GET | /api/Tratamientos/{id} | Obtiene un tratamiento |
+| GET | /api/Tratamientos/{id}/tomas | Lista tomas del tratamiento |
+| GET | /api/Tratamientos/tomas/proximas | Tomas en las próximas 24h |
+| POST | /api/Tratamientos | Crea tratamiento y genera tomas |
+| PUT | /api/Tratamientos/{id}/cancelar | Cancela un tratamiento |
+| POST | /api/Tratamientos/tomas/{id}/confirmar | Confirma toma y descuenta inventario |
+| POST | /api/Tratamientos/tomas/{id}/omitir | Omite una toma |
+
+---
+
+## 8. Flutter — Estructura
+
+```
+lib/
+  constants/
+    api_constants.dart          — URLs de la API
+    app_theme.dart              — Colores y tema visual
+  models/
+    user_model.dart
+    consulta_model.dart         — ConsultaModel, DoctorModel, RecetaModel
+    inventario_model.dart       — InventarioModel, MedicamentoCatalogoModel
+    tratamiento_model.dart      — TratamientoModel, TomaModel
+  screens/
+    auth/
+      login_screen.dart
+      register_screen.dart
+    consultas/
+      consultas_screen.dart
+      nueva_consulta_screen.dart
+      detalle_consulta_screen.dart
+    doctores/
+      doctores_screen.dart
+      nuevo_doctor_screen.dart
+    inventario/
+      inventario_screen.dart
+      agregar_inventario_screen.dart
+    tratamientos/
+      tratamientos_screen.dart
+      nuevo_tratamiento_screen.dart
+      detalle_tratamiento_screen.dart
+    home_screen.dart
+    perfil_screen.dart
+  services/
+    auth_service.dart
+    consulta_service.dart
+    doctor_service.dart
+    inventario_service.dart
+    notification_service.dart
+    perfil_service.dart
+    receta_service.dart
+    tratamiento_service.dart
+  main.dart
+```
+
+---
+
+## 9. Flutter — Módulos
+
+### Autenticación
+- Login con email y contraseña
+- Registro con datos personales
+- Token JWT guardado en SharedPreferences
+- SplashScreen con verificación de sesión y animación
+
+### Perfil
+- Ver datos del usuario
+- Editar nombre, teléfono, tipo de sangre, fecha de nacimiento
+
+### Historial Clínico
+- Lista de consultas ordenadas por fecha
+- Crear consulta con doctor, fecha, síntomas, diagnóstico
+- Ver detalle completo de consulta
+- Subir fotos de recetas (cámara o galería)
 
 ### Doctores
-
-| Método | Endpoint | Auth | Descripción |
-|---|---|---|---|
-| GET | /api/Doctores | ✅ | Lista todos los doctores del usuario |
-| GET | /api/Doctores/{id} | ✅ | Obtiene un doctor por ID |
-| POST | /api/Doctores | ✅ | Crea un nuevo doctor |
-| PUT | /api/Doctores/{id} | ✅ | Actualiza un doctor |
-| DELETE | /api/Doctores/{id} | ✅ | Desactiva un doctor (soft delete) |
-
-### Consultas
-
-| Método | Endpoint | Auth | Descripción |
-|---|---|---|---|
-| GET | /api/Consultas | ✅ | Lista todas las consultas del usuario |
-| GET | /api/Consultas/{id} | ✅ | Obtiene una consulta con sus recetas |
-| POST | /api/Consultas | ✅ | Registra una nueva consulta |
-| PUT | /api/Consultas/{id} | ✅ | Actualiza una consulta |
-| DELETE | /api/Consultas/{id} | ✅ | Elimina una consulta |
-
-### Recetas
-
-| Método | Endpoint | Auth | Descripción |
-|---|---|---|---|
-| POST | /api/Recetas | ✅ | Crea receta con foto (multipart/form-data) |
-| GET | /api/Recetas/{id} | ✅ | Obtiene una receta |
-| DELETE | /api/Recetas/{id} | ✅ | Elimina receta y archivo físico |
+- Lista de doctores registrados
+- Agregar doctor con especialidad y consultorio
+- Eliminar doctor (soft delete)
 
 ### Inventario
-
-| Método | Endpoint | Auth | Descripción |
-|---|---|---|---|
-| GET | /api/Inventario | ✅ | Lista todo el inventario del usuario |
-| GET | /api/Inventario/{id} | ✅ | Obtiene un item del inventario |
-| GET | /api/Inventario/stock-bajo | ✅ | Lista medicamentos con stock bajo |
-| GET | /api/Inventario/catalogo | ✅ | Lista el catálogo de medicamentos |
-| POST | /api/Inventario/catalogo | ✅ | Agrega medicamento al catálogo |
-| POST | /api/Inventario | ✅ | Agrega medicamento al inventario |
-| PUT | /api/Inventario/{id} | ✅ | Actualiza item del inventario |
-| DELETE | /api/Inventario/{id} | ✅ | Elimina item del inventario |
+- Lista con cantidad, status y stock mínimo
+- Agregar medicamento del catálogo
+- Status automático: disponible, agotado, por_vencer, vencido
+- Alerta visual cuando stock está bajo
 
 ### Tratamientos
-
-| Método | Endpoint | Auth | Descripción |
-|---|---|---|---|
-| GET | /api/Tratamientos | ✅ | Lista todos los tratamientos |
-| GET | /api/Tratamientos/activos | ✅ | Lista tratamientos activos |
-| GET | /api/Tratamientos/{id} | ✅ | Obtiene un tratamiento con stats |
-| GET | /api/Tratamientos/{id}/tomas | ✅ | Lista todas las tomas de un tratamiento |
-| GET | /api/Tratamientos/tomas/proximas | ✅ | Tomas pendientes en las próximas 24 horas |
-| POST | /api/Tratamientos | ✅ | Crea tratamiento y genera tomas automáticamente |
-| PUT | /api/Tratamientos/{id}/cancelar | ✅ | Cancela un tratamiento activo |
-| POST | /api/Tratamientos/tomas/{id}/confirmar | ✅ | Confirma una toma y descuenta inventario |
-| POST | /api/Tratamientos/tomas/{id}/omitir | ✅ | Marca una toma como omitida |
+- Lista de activos e historial completo
+- Crear tratamiento con medicamento, dosis, frecuencia y duración
+- Generación automática de tomas al crear tratamiento
+- Confirmar toma → descuenta inventario automáticamente
+- Omitir toma
+- Cancelar tratamiento
+- Notificaciones locales para cada toma programada
+- Zona horaria: America/Mexico_City
 
 ---
 
-## 8. Estructura del proyecto
-
-```
-medico-app/
-├── src/
-│   ├── MedicoApp.API/                  ← API .NET
-│   │   ├── Controllers/
-│   │   │   ├── AuthController.cs
-│   │   │   ├── ConsultasController.cs
-│   │   │   ├── DoctoresController.cs
-│   │   │   ├── InventarioController.cs
-│   │   │   ├── RecetasController.cs
-│   │   │   └── TratamientosController.cs
-│   │   ├── Data/
-│   │   │   └── AppDbContext.cs
-│   │   ├── Helpers/
-│   │   │   └── JwtHelper.cs
-│   │   ├── Models/
-│   │   │   ├── DTOs/
-│   │   │   │   ├── AuthDTOs.cs
-│   │   │   │   ├── ConsultaDTOs.cs
-│   │   │   │   ├── DoctorDTOs.cs
-│   │   │   │   ├── InventarioDTOs.cs
-│   │   │   │   └── TratamientoDTOs.cs
-│   │   │   └── Entities/
-│   │   │       ├── Consulta.cs
-│   │   │       ├── Doctor.cs
-│   │   │       ├── Inventario.cs
-│   │   │       ├── MedicamentoCatalogo.cs
-│   │   │       ├── Receta.cs
-│   │   │       ├── Toma.cs
-│   │   │       ├── Tratamiento.cs
-│   │   │       └── User.cs
-│   │   ├── Services/
-│   │   │   └── Interfaces/
-│   │   ├── Uploads/
-│   │   │   └── Recetas/               ← Fotos de recetas
-│   │   ├── appsettings.json
-│   │   └── Program.cs
-│   └── medico_app/                    ← App Flutter
-│       └── lib/
-│           └── main.dart
-└── README.md
-```
-
----
-
-## 9. Configuración del entorno
+## 10. Configuración del entorno
 
 ### Requisitos
 
@@ -396,17 +352,27 @@ medico-app/
 | SQL Server | 2025 Developer | Base de datos |
 | SSMS | Latest | Administración DB |
 | Bruno | Latest | Pruebas de API |
+| scrcpy | Latest | Espejo de pantalla del celular |
 
-### Extensiones VS Code instaladas
+### Dispositivo de prueba
+- **Modelo:** Redmi Note 12 5G
+- **Android:** 14 (API 34)
+- **Conexión:** WiFi via adb
+- **IP celular:** 192.168.1.77
+- **Comando conexión:** `adb connect 192.168.1.77:5555`
+- **Comando scrcpy:** `.\scrcpy.exe --tcpip=192.168.1.77:5555`
 
-- `dart-code.dart-code` — Soporte Dart
-- `dart-code.flutter` — Soporte Flutter
-- `eamodio.gitlens` — Git avanzado
-- `ms-dotnettools.csharp` — Soporte C#
+### Variables de entorno
+- adb configurado en PATH via perfil de PowerShell
+- Perfil en: `C:\Users\abe\Documents\WindowsPowerShell\Microsoft.PowerShell_profile.ps1`
+
+### Usuario de prueba
+- **Email:** abrahamrios63@gmail.com
+- **Password:** 123456
 
 ---
 
-## 10. Control de versiones
+## 11. Control de versiones
 
 ### Estrategia GitFlow
 
@@ -418,7 +384,6 @@ hotfix/*    → Correcciones urgentes
 ```
 
 ### Repositorio
-
 - **URL:** https://github.com/AbeMabteck/medico-app
 - **Rama activa:** develop
 - **Visibilidad:** Privado
@@ -427,13 +392,35 @@ hotfix/*    → Correcciones urgentes
 
 | Commit | Descripción |
 |---|---|
-| feat: configuracion inicial API .NET con entidades y DbContext | Estructura base de la API |
-| feat: proyecto Flutter inicial | Creación del proyecto móvil |
+| feat: configuracion inicial API .NET con entidades y DbContext | Estructura base API |
+| feat: proyecto Flutter inicial | Creación proyecto móvil |
 | feat: modulo de autenticacion con JWT y BCrypt | Login y registro |
-| feat: modulo historial clinico - doctores, consultas y recetas | Módulo clínico completo |
-| feat: modulo inventario con catalogo de medicamentos | Inventario completo |
-| feat: modulo tratamientos y tomas con descuento automatico de inventario | Módulo de tratamientos completo |
+| feat: modulo historial clinico - doctores, consultas y recetas | Módulo clínico API |
+| feat: modulo inventario con catalogo de medicamentos | Inventario API |
+| feat: modulo tratamientos y tomas con descuento automatico | Tratamientos API |
+| feat: estructura base Flutter con pantallas de autenticacion | Flutter base |
+| feat: conexion Flutter con API real y login funcionando | Login conectado |
+| feat: modulo historial clinico completo en Flutter | Historial Flutter |
+| feat: modulo inventario completo en Flutter | Inventario Flutter |
+| feat: modulo tratamientos completo en Flutter | Tratamientos Flutter |
+| feat: notificaciones locales para recordatorio de tomas | Notificaciones |
+| feat: subir fotos de recetas y modulo doctores completo | Fotos y doctores |
+| feat: pantalla de perfil de usuario | Perfil |
+| feat: splash screen mejorado y AppBar con nombre de usuario | UI mejorada |
 
 ---
 
-*Documentación generada el 2026-06-03. Se actualiza conforme avanza el desarrollo.*
+## 12. Pendientes v2.0
+
+| Funcionalidad | Descripción | Prioridad |
+|---|---|---|
+| Modo offline | Guardar datos localmente y sincronizar al recuperar internet | Alta |
+| Dashboard | Pantalla de inicio con resumen de tomas pendientes y stock bajo | Media |
+| Publicación App Store | Preparar para iOS | Media |
+| Publicación Play Store | Preparar para Android | Media |
+| Notificaciones push | Servidor de notificaciones para múltiples usuarios | Baja |
+| Backup en la nube | Azure Blob Storage para fotos de recetas | Baja |
+
+---
+
+*Documentación actualizada el 2026-06-04.*

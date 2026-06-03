@@ -5,6 +5,7 @@ import 'package:image_picker/image_picker.dart';
 import '../../constants/app_theme.dart';
 import '../../models/consulta_model.dart';
 import '../../services/receta_service.dart';
+import 'ver_imagen_screen.dart';
 
 class DetalleConsultaScreen extends StatefulWidget {
   final ConsultaModel consulta;
@@ -112,7 +113,6 @@ class _DetalleConsultaScreenState extends State<DetalleConsultaScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Fecha y doctor
             _buildCard(
               children: [
                 _buildRow(
@@ -221,9 +221,21 @@ class _DetalleConsultaScreenState extends State<DetalleConsultaScreen> {
                     title: Text('Receta #${r.id}'),
                     subtitle: r.notas != null ? Text(r.notas!) : null,
                     trailing: r.fotoPath != null
-                        ? const Icon(
-                            Icons.image_outlined,
-                            color: AppTheme.successColor,
+                        ? IconButton(
+                            icon: const Icon(
+                              Icons.image_outlined,
+                              color: AppTheme.successColor,
+                            ),
+                            onPressed: () => Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => VerImagenScreen(
+                                  fotoPath: r.fotoPath!,
+                                  titulo: 'Receta #${r.id}',
+                                ),
+                              ),
+                            ),
+                            tooltip: 'Ver imagen',
                           )
                         : null,
                   ),

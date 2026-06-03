@@ -8,7 +8,7 @@
         android:maxSdkVersion="32"/>
 
     <application
-        android:label="medico_app"
+        android:label="MedicoApp"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

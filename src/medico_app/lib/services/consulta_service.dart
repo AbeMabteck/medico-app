@@ -58,6 +58,35 @@ class ConsultaService {
     }
   }
 
+  // Actualizar consulta
+  Future<void> updateConsulta({
+    required int id,
+    required DateTime fecha,
+    int? doctorId,
+    String? motivo,
+    String? sintomas,
+    String? diagnostico,
+    String? notas,
+  }) async {
+    final headers = await _getHeaders();
+    final response = await http.put(
+      Uri.parse('${ApiConstants.consultas}/$id'),
+      headers: headers,
+      body: jsonEncode({
+        'fecha': fecha.toIso8601String(),
+        'doctorId': doctorId,
+        'motivo': motivo,
+        'sintomas': sintomas,
+        'diagnostico': diagnostico,
+        'notas': notas,
+      }),
+    );
+
+    if (response.statusCode != 204) {
+      throw Exception('Error al actualizar consulta');
+    }
+  }
+
   // Eliminar consulta
   Future<void> deleteConsulta(int id) async {
     final headers = await _getHeaders();

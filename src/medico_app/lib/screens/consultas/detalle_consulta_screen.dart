@@ -6,6 +6,7 @@ import '../../constants/app_theme.dart';
 import '../../models/consulta_model.dart';
 import '../../services/receta_service.dart';
 import 'ver_imagen_screen.dart';
+import 'editar_consulta_screen.dart';
 
 class DetalleConsultaScreen extends StatefulWidget {
   final ConsultaModel consulta;
@@ -92,6 +93,22 @@ class _DetalleConsultaScreenState extends State<DetalleConsultaScreen> {
       appBar: AppBar(
         title: const Text('Detalle de consulta'),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.edit_outlined),
+            onPressed: () async {
+              final result = await Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) =>
+                      EditarConsultaScreen(consulta: widget.consulta),
+                ),
+              );
+              if (result == true && mounted) {
+                Navigator.pop(context, true);
+              }
+            },
+            tooltip: 'Editar consulta',
+          ),
           IconButton(
             icon: _isUploading
                 ? const SizedBox(

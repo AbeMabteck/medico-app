@@ -1,7 +1,7 @@
 # MedicoApp — Documentación Técnica
 
-**Versión:** 1.1.0  
-**Fecha:** 2026-06-04  
+**Versión:** 1.0.0  
+**Fecha:** 2026-06-03  
 **Autor:** Abraham Rios  
 
 ---
@@ -25,7 +25,7 @@
 
 ## 1. Descripción general
 
-MedicoApp es una aplicación móvil multiplataforma (iOS y Android) para la gestión médica personal. Permite al usuario llevar un control de sus consultas médicas, doctores, medicamentos en inventario y tratamientos activos con recordatorios automáticos.
+MedicoApp es una aplicación móvil multiplataforma (iOS y Android) para la gestión médica personal. Permite al usuario llevar un control completo de su historial clínico, doctores, medicamentos en inventario y tratamientos activos con recordatorios automáticos de tomas.
 
 ### Módulos implementados
 
@@ -34,9 +34,10 @@ MedicoApp es una aplicación móvil multiplataforma (iOS y Android) para la gest
 | Autenticación | Registro e inicio de sesión con JWT | ✅ Completo |
 | Perfil | Ver y editar datos personales | ✅ Completo |
 | Historial Clínico | Consultas médicas con fotos de recetas | ✅ Completo |
-| Doctores | Registro de médicos | ✅ Completo |
-| Inventario | Control de medicamentos disponibles | ✅ Completo |
-| Tratamientos | Tomas programadas con notificaciones | ✅ Completo |
+| Doctores | CRUD completo de médicos registrados | ✅ Completo |
+| Inventario | Control de medicamentos disponibles con edición | ✅ Completo |
+| Tratamientos | Tomas programadas con notificaciones locales | ✅ Completo |
+| Dashboard | Pantalla de inicio con resumen general | ✅ Completo |
 
 ---
 
@@ -56,6 +57,19 @@ MedicoApp es una aplicación móvil multiplataforma (iOS y Android) para la gest
 | Notificaciones | flutter_local_notifications | 17.2.4 |
 | Timezone | timezone | 0.9.4 |
 | Control de versiones | Git + GitHub | — |
+
+### Paquetes Flutter
+
+| Paquete | Uso |
+|---|---|
+| http | Consumir la API REST |
+| shared_preferences | Guardar token JWT localmente |
+| flutter_local_notifications | Notificaciones de recordatorio de tomas |
+| image_picker | Selección de fotos de recetas (cámara/galería) |
+| intl | Fechas en español (es_MX) |
+| provider | Manejo de estado |
+| flutter_localizations | Localización de la app |
+| timezone | Zona horaria America/Mexico_City |
 
 ---
 
@@ -190,27 +204,27 @@ La API utiliza **JWT (JSON Web Tokens)** con una expiración de 24 horas.
 
 | Método | Endpoint | Descripción |
 |---|---|---|
-| GET | /api/Perfil | Obtiene datos del usuario |
+| GET | /api/Perfil | Obtiene datos del usuario autenticado |
 | PUT | /api/Perfil | Actualiza datos del usuario |
 
 ### Doctores (JWT requerido)
 
 | Método | Endpoint | Descripción |
 |---|---|---|
-| GET | /api/Doctores | Lista todos los doctores |
-| GET | /api/Doctores/{id} | Obtiene un doctor |
+| GET | /api/Doctores | Lista todos los doctores del usuario |
+| GET | /api/Doctores/{id} | Obtiene un doctor por ID |
 | POST | /api/Doctores | Crea un nuevo doctor |
-| PUT | /api/Doctores/{id} | Actualiza un doctor |
-| DELETE | /api/Doctores/{id} | Desactiva un doctor |
+| PUT | /api/Doctores/{id} | Actualiza los datos de un doctor |
+| DELETE | /api/Doctores/{id} | Desactiva un doctor (soft delete) |
 
 ### Consultas (JWT requerido)
 
 | Método | Endpoint | Descripción |
 |---|---|---|
-| GET | /api/Consultas | Lista todas las consultas |
-| GET | /api/Consultas/{id} | Obtiene una consulta con recetas |
+| GET | /api/Consultas | Lista todas las consultas del usuario |
+| GET | /api/Consultas/{id} | Obtiene una consulta con sus recetas |
 | POST | /api/Consultas | Registra una nueva consulta |
-| PUT | /api/Consultas/{id} | Actualiza una consulta |
+| PUT | /api/Consultas/{id} | Actualiza una consulta existente |
 | DELETE | /api/Consultas/{id} | Elimina una consulta |
 
 ### Recetas (JWT requerido)
@@ -218,35 +232,35 @@ La API utiliza **JWT (JSON Web Tokens)** con una expiración de 24 horas.
 | Método | Endpoint | Descripción |
 |---|---|---|
 | POST | /api/Recetas | Crea receta con foto (multipart/form-data) |
-| GET | /api/Recetas/{id} | Obtiene una receta |
-| DELETE | /api/Recetas/{id} | Elimina receta y archivo físico |
+| GET | /api/Recetas/{id} | Obtiene una receta por ID |
+| DELETE | /api/Recetas/{id} | Elimina receta y su archivo físico |
 
 ### Inventario (JWT requerido)
 
 | Método | Endpoint | Descripción |
 |---|---|---|
-| GET | /api/Inventario | Lista todo el inventario |
-| GET | /api/Inventario/{id} | Obtiene un item |
-| GET | /api/Inventario/stock-bajo | Items con stock bajo |
-| GET | /api/Inventario/catalogo | Catálogo de medicamentos |
-| POST | /api/Inventario/catalogo | Agrega al catálogo |
-| POST | /api/Inventario | Agrega al inventario |
-| PUT | /api/Inventario/{id} | Actualiza item |
-| DELETE | /api/Inventario/{id} | Elimina item |
+| GET | /api/Inventario | Lista todo el inventario del usuario |
+| GET | /api/Inventario/{id} | Obtiene un item por ID |
+| GET | /api/Inventario/stock-bajo | Items con stock por debajo del mínimo |
+| GET | /api/Inventario/catalogo | Catálogo global de medicamentos |
+| POST | /api/Inventario/catalogo | Agrega un medicamento al catálogo |
+| POST | /api/Inventario | Agrega un medicamento al inventario |
+| PUT | /api/Inventario/{id} | Actualiza cantidad, unidad, caducidad, precio |
+| DELETE | /api/Inventario/{id} | Elimina un item del inventario |
 
 ### Tratamientos (JWT requerido)
 
 | Método | Endpoint | Descripción |
 |---|---|---|
-| GET | /api/Tratamientos | Lista todos los tratamientos |
-| GET | /api/Tratamientos/activos | Lista tratamientos activos |
-| GET | /api/Tratamientos/{id} | Obtiene un tratamiento |
-| GET | /api/Tratamientos/{id}/tomas | Lista tomas del tratamiento |
-| GET | /api/Tratamientos/tomas/proximas | Tomas en las próximas 24h |
-| POST | /api/Tratamientos | Crea tratamiento y genera tomas |
-| PUT | /api/Tratamientos/{id}/cancelar | Cancela un tratamiento |
-| POST | /api/Tratamientos/tomas/{id}/confirmar | Confirma toma y descuenta inventario |
-| POST | /api/Tratamientos/tomas/{id}/omitir | Omite una toma |
+| GET | /api/Tratamientos | Lista todos los tratamientos del usuario |
+| GET | /api/Tratamientos/activos | Lista únicamente tratamientos activos |
+| GET | /api/Tratamientos/{id} | Obtiene un tratamiento por ID |
+| GET | /api/Tratamientos/{id}/tomas | Lista todas las tomas de un tratamiento |
+| GET | /api/Tratamientos/tomas/proximas | Tomas programadas en las próximas 24h |
+| POST | /api/Tratamientos | Crea tratamiento y genera tomas automáticamente |
+| PUT | /api/Tratamientos/{id}/cancelar | Cancela un tratamiento activo |
+| POST | /api/Tratamientos/tomas/{id}/confirmar | Confirma una toma y descuenta inventario |
+| POST | /api/Tratamientos/tomas/{id}/omitir | Omite una toma programada |
 
 ---
 
@@ -269,17 +283,22 @@ lib/
     consultas/
       consultas_screen.dart
       nueva_consulta_screen.dart
+      editar_consulta_screen.dart
       detalle_consulta_screen.dart
+      ver_imagen_screen.dart
     doctores/
       doctores_screen.dart
       nuevo_doctor_screen.dart
+      editar_doctor_screen.dart
     inventario/
       inventario_screen.dart
       agregar_inventario_screen.dart
+      editar_inventario_screen.dart
     tratamientos/
       tratamientos_screen.dart
       nuevo_tratamiento_screen.dart
       detalle_tratamiento_screen.dart
+    dashboard_screen.dart
     home_screen.dart
     perfil_screen.dart
   services/
@@ -300,38 +319,47 @@ lib/
 
 ### Autenticación
 - Login con email y contraseña
-- Registro con datos personales
+- Registro con datos personales (nombre, email, contraseña)
 - Token JWT guardado en SharedPreferences
 - SplashScreen con verificación de sesión y animación
 
 ### Perfil
-- Ver datos del usuario
+- Ver datos del usuario autenticado
 - Editar nombre, teléfono, tipo de sangre, fecha de nacimiento
+
+### Dashboard
+- Pantalla de inicio con resumen general
+- Muestra tomas próximas, stock bajo e información relevante
 
 ### Historial Clínico
 - Lista de consultas ordenadas por fecha
-- Crear consulta con doctor, fecha, síntomas, diagnóstico
+- Crear consulta con doctor, fecha, síntomas y diagnóstico
+- Editar consulta existente
 - Ver detalle completo de consulta
 - Subir fotos de recetas (cámara o galería)
+- Ver imagen de receta en pantalla completa
 
 ### Doctores
 - Lista de doctores registrados
-- Agregar doctor con especialidad y consultorio
+- Agregar doctor con nombre, especialidad y consultorio
+- Editar datos de un doctor existente
 - Eliminar doctor (soft delete)
 
 ### Inventario
-- Lista con cantidad, status y stock mínimo
-- Agregar medicamento del catálogo
+- Lista con cantidad actual, status y stock mínimo
+- Agregar medicamento desde el catálogo global
+- Editar cantidad, unidad, fecha de caducidad, lugar de compra y precio
+- Eliminar medicamento del inventario
 - Status automático: disponible, agotado, por_vencer, vencido
-- Alerta visual cuando stock está bajo
+- Alerta visual cuando el stock está por debajo del mínimo
 
 ### Tratamientos
-- Lista de activos e historial completo
+- Lista de tratamientos activos e historial completo
 - Crear tratamiento con medicamento, dosis, frecuencia y duración
-- Generación automática de tomas al crear tratamiento
+- Generación automática de tomas al crear el tratamiento
 - Confirmar toma → descuenta inventario automáticamente
-- Omitir toma
-- Cancelar tratamiento
+- Omitir toma programada
+- Cancelar tratamiento activo
 - Notificaciones locales para cada toma programada
 - Zona horaria: America/Mexico_City
 
@@ -355,6 +383,7 @@ lib/
 | scrcpy | Latest | Espejo de pantalla del celular |
 
 ### Dispositivo de prueba
+
 - **Modelo:** Redmi Note 12 5G
 - **Android:** 14 (API 34)
 - **Conexión:** WiFi via adb
@@ -363,10 +392,12 @@ lib/
 - **Comando scrcpy:** `.\scrcpy.exe --tcpip=192.168.1.77:5555`
 
 ### Variables de entorno
+
 - adb configurado en PATH via perfil de PowerShell
 - Perfil en: `C:\Users\abe\Documents\WindowsPowerShell\Microsoft.PowerShell_profile.ps1`
 
 ### Usuario de prueba
+
 - **Email:** abrahamrios63@gmail.com
 - **Password:** 123456
 
@@ -384,11 +415,12 @@ hotfix/*    → Correcciones urgentes
 ```
 
 ### Repositorio
+
 - **URL:** https://github.com/AbeMabteck/medico-app
 - **Rama activa:** develop
 - **Visibilidad:** Privado
 
-### Historial de commits
+### Historial de commits — v1.0.0
 
 | Commit | Descripción |
 |---|---|
@@ -407,6 +439,8 @@ hotfix/*    → Correcciones urgentes
 | feat: subir fotos de recetas y modulo doctores completo | Fotos y doctores |
 | feat: pantalla de perfil de usuario | Perfil |
 | feat: splash screen mejorado y AppBar con nombre de usuario | UI mejorada |
+| feat: agregar boton editar en inventario_screen | Editar inventario |
+| release: v1.0.0 - MedicoApp version inicial completa | Release producción |
 
 ---
 
@@ -415,12 +449,11 @@ hotfix/*    → Correcciones urgentes
 | Funcionalidad | Descripción | Prioridad |
 |---|---|---|
 | Modo offline | Guardar datos localmente y sincronizar al recuperar internet | Alta |
-| Dashboard | Pantalla de inicio con resumen de tomas pendientes y stock bajo | Media |
-| Publicación App Store | Preparar para iOS | Media |
-| Publicación Play Store | Preparar para Android | Media |
+| Publicación Play Store | Preparar y publicar para Android | Media |
+| Publicación App Store | Preparar y publicar para iOS | Media |
 | Notificaciones push | Servidor de notificaciones para múltiples usuarios | Baja |
 | Backup en la nube | Azure Blob Storage para fotos de recetas | Baja |
 
 ---
 
-*Documentación actualizada el 2026-06-04.*
+*Documentación actualizada el 2026-06-03.*

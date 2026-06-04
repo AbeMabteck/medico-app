@@ -5,12 +5,25 @@ import 'constants/app_theme.dart';
 import 'screens/auth/login_screen.dart';
 import 'screens/home_screen.dart';
 import 'services/auth_service.dart';
+import 'services/database_service.dart';
 import 'services/notification_service.dart';
+import 'services/sync_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await initializeDateFormatting('es', null);
+
+  // Inicializar la base de datos local SQLite antes de arrancar la app.
+  // Esto crea las tablas si no existen (primera vez que se abre la app).
+  await DatabaseService().db;
+
+  // Inicializar notificaciones locales para recordatorios de tomas.
   await NotificationService().initialize();
+
+  // Iniciar el listener de conectividad que detecta cuando el dispositivo
+  // recupera internet y dispara la sincronización automática de pendientes.
+  SyncService().startConnectivityListener();
+
   runApp(const MedicoApp());
 }
 
@@ -109,7 +122,6 @@ class _SplashScreenState extends State<SplashScreen>
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  // Logo
                   Container(
                     width: 130,
                     height: 130,

@@ -43,6 +43,8 @@ dependencies:
     sdk: flutter
   flutter_local_notifications: 17.2.4
   timezone: 0.9.4
+  sqflite: ^2.4.3
+  connectivity_plus: ^7.1.1
 dev_dependencies:
   flutter_test:
     sdk: flutter

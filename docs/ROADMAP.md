@@ -1,288 +1,88 @@
-# ROADMAP.md
+---
 
-# MedicoApp — Roadmap Oficial
+# Filosofía de Diseño
 
-Versión del documento: 1.0
-Última actualización: 2026-06-04
+## Visión de Experiencia de Usuario
+
+MedicoApp no debe sentirse como un sistema hospitalario, un software administrativo ni una plataforma exclusiva para médicos.
+
+La aplicación está diseñada para usuarios comunes que desean llevar el control de su salud de forma sencilla, rápida, organizada y accesible.
+
+El objetivo principal es que cualquier persona pueda entender y utilizar la aplicación sin capacitación previa.
 
 ---
 
-# Visión del Producto
+## Principios de Diseño
 
-MedicoApp busca convertirse en una plataforma integral para la gestión médica personal, permitiendo a los usuarios centralizar su historial clínico, medicamentos, tratamientos, estudios médicos y seguimiento de salud en una sola aplicación.
+### Simplicidad
 
-El objetivo es evolucionar desde una aplicación de control médico personal hacia un expediente médico digital inteligente con capacidades de automatización y asistencia mediante inteligencia artificial.
+La información más importante debe estar visible en pocos segundos.
 
----
+El usuario no debe navegar por múltiples pantallas para encontrar información relevante sobre sus medicamentos, tratamientos o historial médico.
 
-# Estado Actual
+### Centralización
 
-## v1.0.0 — COMPLETADA ✅
+Toda la información médica personal debe encontrarse en un solo lugar.
 
-### Autenticación
+Consultas, recetas, tratamientos, inventario, estudios médicos y futuras funcionalidades deberán mantenerse integradas dentro del mismo ecosistema.
 
-* Login
-* Registro
-* JWT
+### Prevención
 
-### Historial Clínico
+La aplicación debe ayudar al usuario a prevenir errores, olvidos y problemas relacionados con el seguimiento de tratamientos médicos.
 
-* Consultas
-* Recetas
-* Fotos
+Las alertas y recordatorios deben actuar como herramientas preventivas.
 
-### Doctores
+### Automatización
 
-* CRUD completo
+Siempre que sea posible, MedicoApp debe reducir la captura manual de información.
 
-### Inventario
+Las futuras versiones incorporarán OCR, automatizaciones e inteligencia artificial para facilitar la gestión médica personal.
 
-* Alta
-* Edición
-* Eliminación
-* Stock bajo
+### Confianza
 
-### Tratamientos
+La interfaz debe transmitir seguridad, profesionalismo y tranquilidad.
 
-* Creación automática de tomas
-* Confirmación de tomas
-* Omisión de tomas
-* Cancelación
+La aplicación debe inspirar confianza para almacenar información médica sensible.
 
-### Dashboard
+### Accesibilidad
 
-* Resumen general
-
-### Perfil
-
-* Información del usuario
-
-### Infraestructura
-
-* SQLite Offline
-* Sincronización automática
-* Notificaciones locales
-
-Estado:
-PRODUCCIÓN LOCAL
+La aplicación debe ser fácil de utilizar para cualquier persona independientemente de su edad o nivel técnico.
 
 ---
 
-# v2.0.0 — DESPLIEGUE EN NUBE
+## Identidad del Producto
 
-Prioridad: CRÍTICA
+MedicoApp debe percibirse como:
 
-Objetivo:
-Validar la arquitectura completa en entorno real de Internet.
+* Un asistente médico personal.
+* Un expediente médico digital.
+* Un organizador de tratamientos y medicamentos.
+* Una herramienta preventiva para el cuidado de la salud.
 
-## Backend
+MedicoApp NO debe percibirse como:
 
-* [ ] Publicar API .NET en Railway
-* [ ] Configurar variables de entorno
-* [ ] Configurar HTTPS
-* [ ] Configurar logs
-
-## Base de Datos
-
-* [ ] Crear instancia productiva
-* [ ] Ejecutar migraciones
-* [ ] Respaldos automáticos
-
-## Flutter
-
-* [ ] Configurar URL producción
-* [ ] Manejo de errores mejorado
-* [ ] Validar reconexión
-
-## QA
-
-* [ ] Pruebas WiFi
-* [ ] Pruebas 4G
-* [ ] Pruebas 5G
-* [ ] Validar sincronización offline
-
-Estado:
-PENDIENTE
+* Un sistema hospitalario.
+* Un ERP médico.
+* Un software administrativo.
+* Una plataforma exclusiva para profesionales de la salud.
 
 ---
 
-# v2.1.0 — AUTOMATIZACIÓN MÉDICA
+## Enfoque Visual Futuro
 
-Prioridad: ALTA
+La experiencia visual deberá combinar:
 
-Objetivo:
-Reducir captura manual de información.
+* Salud.
+* Tecnología.
+* Organización.
+* Simplicidad.
 
-## OCR de Recetas
+El diseño priorizará:
 
-* [ ] Capturar receta
-* [ ] Extraer texto
-* [ ] Detectar medicamentos
-* [ ] Detectar dosis
-* [ ] Detectar frecuencia
+* Tarjetas informativas.
+* Navegación sencilla.
+* Iconografía clara.
+* Colores que transmitan confianza.
+* Información relevante visible desde la pantalla principal.
 
-## Inventario Inteligente
-
-* [ ] Predicción de consumo
-* [ ] Cálculo de duración restante
-* [ ] Alertas preventivas
-
-## Dashboard Avanzado
-
-* [ ] Próximas tomas
-* [ ] Medicamentos por vencer
-* [ ] Estadísticas rápidas
-
-Estado:
-PLANIFICADA
-
----
-
-# v2.2.0 — EXPEDIENTE MÉDICO
-
-Prioridad: ALTA
-
-Objetivo:
-Crear expediente médico integral.
-
-## Antecedentes
-
-* [ ] Tipo de sangre
-* [ ] Alergias
-* [ ] Enfermedades crónicas
-* [ ] Cirugías
-* [ ] Vacunas
-
-## Perfil Médico
-
-* [ ] Resumen clínico
-* [ ] Información de emergencia
-
-Estado:
-PLANIFICADA
-
----
-
-# v2.3.0 — ESTUDIOS MÉDICOS
-
-Prioridad: MEDIA
-
-Objetivo:
-Centralizar documentación médica.
-
-## Estudios
-
-* [ ] Laboratorios
-* [ ] Rayos X
-* [ ] Resonancias
-* [ ] Ultrasonidos
-* [ ] Tomografías
-
-## Archivos
-
-* [ ] PDF
-* [ ] Imágenes
-* [ ] Compartir documentos
-
-Estado:
-PLANIFICADA
-
----
-
-# v2.4.0 — PRODUCTIVIDAD
-
-Prioridad: MEDIA
-
-Objetivo:
-Facilitar intercambio de información médica.
-
-## Exportaciones
-
-* [ ] PDF expediente
-* [ ] PDF tratamiento
-* [ ] PDF consultas
-
-## Compartir
-
-* [ ] Compartir expediente
-* [ ] Compartir recetas
-* [ ] Compartir estudios
-
-Estado:
-PLANIFICADA
-
----
-
-# v3.0.0 — MEDICOAPP INTELIGENTE
-
-Prioridad: ESTRATÉGICA
-
-Objetivo:
-Incorporar automatización avanzada e inteligencia artificial.
-
-## Inteligencia Artificial
-
-* [ ] Interpretación de recetas
-* [ ] Resumen clínico automático
-* [ ] Asistente médico personal
-
-## Notificaciones Push
-
-* [ ] Firebase Cloud Messaging
-* [ ] Recordatorios remotos
-
-## Widget Android
-
-* [ ] Próxima toma
-* [ ] Confirmación rápida
-
-## Widget iOS
-
-* [ ] Resumen diario
-
-Estado:
-VISIÓN FUTURA
-
----
-
-# Ideas en Evaluación
-
-## Futuras Funcionalidades
-
-* Telemedicina
-* Agenda de citas
-* Integración con smartwatch
-* Integración con Google Fit
-* Integración con Apple Health
-* Respaldo automático en la nube
-* Portal web
-
-Estado:
-BACKLOG
-
----
-
-# Reglas de Versionado
-
-PATCH (x.x.1)
-
-* Corrección de errores
-
-MINOR (x.1.x)
-
-* Nuevas funcionalidades compatibles
-
-MAJOR (1.x.x)
-
-* Cambios importantes de arquitectura o producto
-
-Ejemplos:
-
-v2.0.1
-Corrección de errores
-
-v2.1.0
-OCR de recetas
-
-v3.0.0
-IA médica
+La pantalla de Inicio (Dashboard) será el centro de la experiencia de usuario y concentrará la información más importante de toda la aplicación.

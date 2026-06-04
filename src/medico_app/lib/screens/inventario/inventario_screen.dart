@@ -3,6 +3,7 @@ import '../../constants/app_theme.dart';
 import '../../models/inventario_model.dart';
 import '../../services/inventario_service.dart';
 import 'agregar_inventario_screen.dart';
+import 'editar_inventario_screen.dart';
 
 class InventarioScreen extends StatefulWidget {
   const InventarioScreen({super.key});
@@ -194,6 +195,21 @@ class _InventarioScreenState extends State<InventarioScreen> {
                         ),
                     ],
                   ),
+                ),
+                IconButton(
+                  icon: const Icon(
+                    Icons.edit_outlined,
+                    color: AppTheme.primaryColor,
+                  ),
+                  onPressed: () async {
+                    final result = await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => EditarInventarioScreen(item: item),
+                      ),
+                    );
+                    if (result == true) _loadInventario();
+                  },
                 ),
                 IconButton(
                   icon: const Icon(

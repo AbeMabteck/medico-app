@@ -25,7 +25,7 @@
 
 ## 1. Descripción general
 
-MedicoApp es una aplicación móvil multiplataforma (iOS y Android) para la gestión médica personal. Permite al usuario llevar un control completo de su historial clínico, doctores, medicamentos en inventario y tratamientos activos con recordatorios automáticos de tomas.
+MedicoApp es una aplicación móvil multiplataforma (iOS y Android) para la gestión médica personal. Permite al usuario llevar un control completo de su expediente médico, doctores, medicamentos en inventario y tratamientos activos con recordatorios automáticos de tomas.
 
 ### Módulos implementados
 
@@ -33,7 +33,7 @@ MedicoApp es una aplicación móvil multiplataforma (iOS y Android) para la gest
 |---|---|---|
 | Autenticación | Registro e inicio de sesión con JWT | ✅ Completo |
 | Perfil | Ver y editar datos personales | ✅ Completo |
-| Historial Clínico | Consultas médicas con fotos de recetas | ✅ Completo |
+| Expediente Médico | Consultas médicas con fotos de recetas | ✅ Completo |
 | Doctores | CRUD completo de médicos registrados | ✅ Completo |
 | Inventario | Control de medicamentos disponibles con edición | ✅ Completo |
 | Tratamientos | Tomas programadas con notificaciones locales | ✅ Completo |
@@ -331,7 +331,7 @@ lib/
 - Pantalla de inicio con resumen general
 - Muestra tomas próximas, stock bajo e información relevante
 
-### Historial Clínico
+### Expediente Médico
 - Lista de consultas ordenadas por fecha
 - Crear consulta con doctor, fecha, síntomas y diagnóstico
 - Editar consulta existente

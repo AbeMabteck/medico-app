@@ -450,6 +450,31 @@ Los siguientes endpoints no deben implementarse todavía. Quedan documentados pa
 
 ---
 
+# Dashboard
+
+## GET /api/Dashboard/resumen
+
+Obtiene toda la información necesaria para construir el Dashboard principal de MedicoApp.
+
+### Autenticación
+
+JWT requerido.
+
+### Información sugerida
+
+* Próxima toma.
+* Tratamientos activos.
+* Medicamentos con stock bajo.
+* Próxima consulta.
+* Recordatorios del día.
+* Resumen rápido del expediente.
+
+### Objetivo
+
+Reducir llamadas múltiples desde Flutter y centralizar la información más importante del usuario.
+
+---
+
 # v2.1.0 — OCR de Recetas
 
 ## POST /api/Recetas/{id}/ocr

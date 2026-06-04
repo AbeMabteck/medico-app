@@ -549,6 +549,23 @@ CreadoPor
 ActualizadoPor
 ```
 
+### Recomendación para Tablas Actuales
+
+Aunque varias tablas actuales ya cuentan con `FechaCreacion`, se recomienda evaluar la incorporación de `FechaActualizacion` en tablas principales como:
+
+- Users
+- Doctors
+- Consultas
+- Inventario
+- Tratamientos
+
+Esto será especialmente importante para:
+
+- Sincronización offline.
+- Resolución de conflictos.
+- Auditoría de cambios.
+- Migración a entorno de nube.
+
 ---
 
 ## Seguridad

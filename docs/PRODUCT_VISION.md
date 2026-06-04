@@ -137,7 +137,7 @@ La aplicación debe poder utilizarse independientemente del nivel técnico del u
 
 A diferencia de otras aplicaciones que únicamente gestionan medicamentos o únicamente almacenan historial médico, MedicoApp busca integrar:
 
-* Historial Clínico.
+* Expediente médico digital.
 * Doctores.
 * Consultas.
 * Recetas.

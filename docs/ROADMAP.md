@@ -28,7 +28,7 @@ Producción Local
 * Registro
 * JWT
 
-### Historial Clínico
+### Expediente Médico
 
 * Consultas
 * Recetas

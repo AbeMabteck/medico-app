@@ -30,7 +30,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   final List<String> _titles = [
     'Inicio',
-    'Historial Clínico',
+    'Expediente Médico',
     'Mis Doctores',
     'Inventario',
     'Tratamientos',
@@ -111,7 +111,7 @@ class _HomeScreenState extends State<HomeScreen> {
           BottomNavigationBarItem(
             icon: Icon(Icons.medical_information_outlined),
             activeIcon: Icon(Icons.medical_information),
-            label: 'Historial',
+            label: 'Expediente',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.person_outlined),

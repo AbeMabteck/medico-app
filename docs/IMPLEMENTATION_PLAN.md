@@ -45,15 +45,15 @@ COMPLETADA
 Estado:
 
 ```text
-PENDIENTE
+EN PROGRESO
 ```
 
 ## Base del Proyecto
 
-* [ ] Revisar estructura actual Flutter
+* [x] Revisar estructura actual Flutter
 * [ ] Definir estructura final de carpetas
-* [ ] Validar arquitectura actual
-* [ ] Identificar refactorizaciones necesarias
+* [x] Validar arquitectura actual
+* [x] Identificar refactorizaciones necesarias
 
 ---
 
@@ -92,10 +92,10 @@ PENDIENTE
 
 ## Expediente
 
-* [ ] Pantalla principal
-* [ ] Lista de consultas
-* [ ] Detalle de consulta
-* [ ] Visualización de recetas
+* [x] Pantalla principal inicial
+* [x] Lista de consultas
+* [x] Detalle de consulta
+* [x] Visualización básica de recetas
 
 ---
 

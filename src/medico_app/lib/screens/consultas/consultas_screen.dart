@@ -67,20 +67,34 @@ class _ConsultasScreenState extends State<ConsultasScreen> {
     }
   }
 
+  void _showProximamente(String modulo) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('$modulo estará disponible próximamente'),
+        backgroundColor: AppTheme.primaryColor,
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
-          : _consultas.isEmpty
-          ? _buildEmpty()
           : RefreshIndicator(
               onRefresh: _loadConsultas,
-              child: ListView.builder(
+              child: ListView(
                 padding: const EdgeInsets.all(16),
-                itemCount: _consultas.length,
-                itemBuilder: (context, index) =>
-                    _buildConsultaCard(_consultas[index]),
+                children: [
+                  _buildExpedienteHeader(),
+                  const SizedBox(height: 20),
+                  _buildSectionTitle(),
+                  const SizedBox(height: 12),
+                  if (_consultas.isEmpty)
+                    _buildEmpty()
+                  else
+                    ..._consultas.map(_buildConsultaCard),
+                ],
               ),
             ),
       floatingActionButton: FloatingActionButton(
@@ -97,31 +111,189 @@ class _ConsultasScreenState extends State<ConsultasScreen> {
     );
   }
 
-  Widget _buildEmpty() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            Icons.medical_information_outlined,
-            size: 80,
-            color: AppTheme.textSecondary.withOpacity(0.5),
+  Widget _buildExpedienteHeader() {
+    final totalRecetas = _consultas.fold<int>(
+      0,
+      (total, consulta) => total + consulta.recetas.length,
+    );
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'Mi expediente',
+          style: TextStyle(
+            fontSize: 22,
+            fontWeight: FontWeight.bold,
+            color: AppTheme.textPrimary,
           ),
-          const SizedBox(height: 16),
-          const Text(
-            'No hay consultas registradas',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.w500,
-              color: AppTheme.textSecondary,
+        ),
+        const SizedBox(height: 6),
+        const Text(
+          'Consulta y organiza tu información médica personal.',
+          style: TextStyle(fontSize: 14, color: AppTheme.textSecondary),
+        ),
+        const SizedBox(height: 16),
+        GridView.count(
+          crossAxisCount: 2,
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          crossAxisSpacing: 12,
+          mainAxisSpacing: 12,
+          childAspectRatio: 1.65,
+          children: [
+            _buildShortcutCard(
+              title: 'Consultas',
+              value: _consultas.length.toString(),
+              icon: Icons.medical_information_outlined,
+              color: AppTheme.primaryColor,
+              onTap: () {},
             ),
+            _buildShortcutCard(
+              title: 'Recetas',
+              value: totalRecetas.toString(),
+              icon: Icons.receipt_long_outlined,
+              color: AppTheme.accentColor,
+              onTap: () => _showProximamente('Recetas'),
+            ),
+            _buildShortcutCard(
+              title: 'Estudios',
+              value: '0',
+              icon: Icons.science_outlined,
+              color: AppTheme.secondaryColor,
+              onTap: () => _showProximamente('Estudios médicos'),
+            ),
+            _buildShortcutCard(
+              title: 'Antecedentes',
+              value: '0',
+              icon: Icons.folder_shared_outlined,
+              color: AppTheme.warningColor,
+              onTap: () => _showProximamente('Antecedentes médicos'),
+            ),
+            _buildShortcutCard(
+              title: 'Alergias',
+              value: '0',
+              icon: Icons.warning_amber_rounded,
+              color: AppTheme.errorColor,
+              onTap: () => _showProximamente('Alergias'),
+            ),
+            _buildShortcutCard(
+              title: 'Vacunas',
+              value: '0',
+              icon: Icons.vaccines_outlined,
+              color: AppTheme.successColor,
+              onTap: () => _showProximamente('Vacunas'),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildShortcutCard({
+    required String title,
+    required String value,
+    required IconData icon,
+    required Color color,
+    required VoidCallback onTap,
+  }) {
+    return Card(
+      child: InkWell(
+        borderRadius: BorderRadius.circular(12),
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.all(14),
+          child: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(9),
+                decoration: BoxDecoration(
+                  color: color.withOpacity(0.12),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Icon(icon, color: color, size: 24),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      value,
+                      style: const TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: AppTheme.textPrimary,
+                      ),
+                    ),
+                    Text(
+                      title,
+                      style: const TextStyle(
+                        fontSize: 13,
+                        color: AppTheme.textSecondary,
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
-          const SizedBox(height: 8),
-          const Text(
-            'Toca el botón + para agregar una',
-            style: TextStyle(color: AppTheme.textSecondary),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSectionTitle() {
+    return Row(
+      children: const [
+        Icon(
+          Icons.local_hospital_outlined,
+          color: AppTheme.primaryColor,
+          size: 22,
+        ),
+        SizedBox(width: 8),
+        Text(
+          'Consultas médicas',
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            color: AppTheme.textPrimary,
           ),
-        ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildEmpty() {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 36, horizontal: 20),
+        child: Column(
+          children: [
+            Icon(
+              Icons.medical_information_outlined,
+              size: 70,
+              color: AppTheme.textSecondary.withOpacity(0.5),
+            ),
+            const SizedBox(height: 16),
+            const Text(
+              'No hay consultas registradas',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w500,
+                color: AppTheme.textSecondary,
+              ),
+            ),
+            const SizedBox(height: 8),
+            const Text(
+              'Toca el botón + para agregar una consulta médica.',
+              textAlign: TextAlign.center,
+              style: TextStyle(color: AppTheme.textSecondary),
+            ),
+          ],
+        ),
       ),
     );
   }
